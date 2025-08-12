@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.side.pj.teamwork.notice.NoticeMapper" >
+    <select id="selectByCompanyAndMonth" parameterType="map" resultType="com.side.pj.teamwork.notice.dto.ResNotice">
+            select
+        n.id as noticeLd,
+        title,
+        content,
+        fileUrl,
+        createAt
+            from
+                notice n join company c on n.company_id = c.id
+            where
+                c.name = #{company}
+            and n.createAt>#{date}
+    </select>
+
+    <select id="noticeGetPage" parameterType="map" resultType="com.side.pj.teamwork.notice.dto.ResNoticeMainDto">
+        select
+            n.id,
+            title,
+            content,
+            fileUrl,
+            createAt
+        from notice n join company c on n.company_id = c.id
+        where c.name =#{company}
+        order by c.id desc limit 10 offset #{offset}
+    </select>
+
+    <select id="selectCount" parameterType="string" resultType="int">
+        select
+            count(n.id)
+        from notice n
+        join company c on n.company_id = c.id
+        where c.name = #{company}
+    </select>
+</mapper>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.side.pj.teamwork.todo.TodoMapper">
+
+    <select id="selectByCompanyAndDepartment"
+            parameterType="map"
+            resultType="com.side.pj.teamwork.todo.dto.ResDashTodo">
+        SELECT
+        t.id,
+        t.title,
+        t.content,
+        d.name AS department,
+        s.name AS status,
+        l.name AS level,
+        u.name AS userName,
+        t.create_time AS createTime,
+        t.update_time AS updateTime,
+        t.expired_time AS expiredTime
+        FROM todo t
+        JOIN department d ON d.id = t.department_id
+        JOIN company c ON d.company_id = c.id
+        JOIN level l ON l.id = t.level_id
+        JOIN status s ON s.id = t.todo_status_id
+        JOIN user u ON u.id = t.user_id
+        <where>
+            c.name = #{company}
+
+            <if test="department != null and department != ''">
+                AND d.name = #{department}
+            </if>
+
+            <if test="(department == null or department == '') and username != null">
+                AND u.login_id = #{username}
+            </if>
+        </where>
+    </select>
+    <select id="selectByCompanyAndStatus" parameterType="map" resultType="com.side.pj.teamwork.todo.dto.ResTodo">
+        select
+            t.id as id,
+            t.title as title,
+            t.content as content,
+            l.name as level,
+            s.name as status,
+            t.create_time as createTime,
+            t.expired_time as expiredTime
+        from todo t
+        join user u on t.user_id = u.id
+        join status s on s.id = t.todo_status_id
+        join level l on l.id = t.level_id
+        join company c on c.id = t.company_id
+        where s.name = #{status}
+        and u.login_id = #{id}
+        and c.name = #{company}
+    </select>
+
+</mapper>

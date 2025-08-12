@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.side.pj.teamwork.user.UserMapper">
+    <select id="selectUser" parameterType="String" resultType="com.side.pj.teamwork.user.dto.ResLoginUser">
+        select
+                id,
+                login_id as loginId,
+                password,
+                name,
+                role_id
+            from user where login_id = #{id}
+    </select>
+    <insert id="insertUser" useGeneratedKeys="true" keyProperty="id" parameterType="com.side.pj.teamwork.user.dto.ResLoginUser">
+        insert into user (login_id,password,name,createAt) values (#{loginId},#{password},#{name},now())
+    </insert>
+
+</mapper>
