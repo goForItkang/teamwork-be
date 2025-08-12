@@ -9,6 +9,14 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
+    # BACK_PATH 시크릿이 비어도 기본값을 사용하도록 잡아둠
+    env:
+      BACK_PATH: ${{ secrets.BACK_PATH || '/opt/teamwork-backend' }}
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_PORT: ${{ secrets.SSH_PORT }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      APP_JAVA_OPTS: ${{ secrets.APP_JAVA_OPTS }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,64 +45,51 @@ jobs:
 
       - name: Build with Gradle
         if: steps.tool.outputs.TOOL == 'gradle'
+        id: grad
         run: |
           ./gradlew clean bootJar -x test
           echo "JAR_PATH=$(ls -1 build/libs/*.jar | head -n 1)" >> $GITHUB_OUTPUT
-        id: grad
 
       - name: Build with Maven
         if: steps.tool.outputs.TOOL == 'maven'
+        id: mvn
         run: |
           mvn -B -DskipTests package
           echo "JAR_PATH=$(ls -1 target/*.jar | head -n 1)" >> $GITHUB_OUTPUT
-        id: mvn
 
       - name: Resolve JAR path
         id: jar
         run: |
           echo "JAR=${{ steps.grad.outputs.JAR_PATH || steps.mvn.outputs.JAR_PATH }}" >> $GITHUB_OUTPUT
+          test -n "${{ steps.grad.outputs.JAR_PATH || steps.mvn.outputs.JAR_PATH }}" || (echo "No JAR found"; exit 1)
+          ls -l "${{ steps.grad.outputs.JAR_PATH || steps.mvn.outputs.JAR_PATH }}"
+
+      # ssh-agent로 프라이빗 키 로드 (libcrypto 에러 방지)
+      - name: Start ssh-agent and add key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
 
       - name: Add server to known_hosts
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -p "${{ secrets.SSH_PORT }}" "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
-
-      - name: Create SSH key file
-        run: |
-          echo "${{ secrets.SSH_KEY }}" > id_rsa
-          chmod 600 id_rsa
+          ssh-keyscan -p "$SSH_PORT" "$SSH_HOST" >> ~/.ssh/known_hosts
 
       - name: Prepare remote dirs
-        env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_PORT: ${{ secrets.SSH_PORT }}
-          SSH_USER: ${{ secrets.SSH_USER }}
-          BACK_PATH: ${{ secrets.BACK_PATH }}
         run: |
-          ssh -i id_rsa -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
+          ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
             "mkdir -p '$BACK_PATH/upload' '$BACK_PATH/releases' '$BACK_PATH/current' '$BACK_PATH/logs'"
 
       - name: Upload JAR (SCP)
-        env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_PORT: ${{ secrets.SSH_PORT }}
-          SSH_USER: ${{ secrets.SSH_USER }}
-          BACK_PATH: ${{ secrets.BACK_PATH }}
         run: |
-          scp -i id_rsa -P "$SSH_PORT" "${{ steps.jar.outputs.JAR }}" \
+          scp -P "$SSH_PORT" "${{ steps.jar.outputs.JAR }}" \
             "$SSH_USER@$SSH_HOST:$BACK_PATH/upload/app.jar"
 
       - name: Switch & Restart (nohup)
-        env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_PORT: ${{ secrets.SSH_PORT }}
-          SSH_USER: ${{ secrets.SSH_USER }}
-          BACK_PATH: ${{ secrets.BACK_PATH }}
-          APP_JAVA_OPTS: ${{ secrets.APP_JAVA_OPTS }}   # 선택: JVM 옵션
         run: |
-          ssh -i id_rsa -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" /bin/bash -lc '
+          ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" /bin/bash -lc '
             set -e
-            BACK_PATH="${BACK_PATH:-/opt/teamwork-backend}"
+            BACK_PATH="'$BACK_PATH'"
             TS=$(date +%Y%m%d-%H%M%S)
             REL="$BACK_PATH/releases/app-$TS.jar"
 
@@ -107,5 +102,5 @@ jobs:
 
             # 새로 기동 (nohup)
             nohup java ${APP_JAVA_OPTS:-} -jar "$BACK_PATH/current/app.jar" \
-              > "$BACK_PATH/logs/app.log" 2>&1 &
+              >> "$BACK_PATH/logs/app.log" 2>&1 &
           '
