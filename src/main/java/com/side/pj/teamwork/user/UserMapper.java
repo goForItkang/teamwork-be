@@ -11,4 +11,6 @@ public interface UserMapper {
     //로그인한 유저 Query문
     ResLoginUser selectUser(String id);
     void insertUser(ReqSignupUser reqSignupUser);
+
+    Long selectUserLoginId(String loginId);
 }

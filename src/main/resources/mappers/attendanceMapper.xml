@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.side.pj.teamwork.attendance.AttendanceMapper" >
+    <insert id="insertAttendance" parameterType="long" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into attendance (attendance_start,user_id) values (now(),#{userId})
+    </insert>
+    <select id="selectByUserId"
+            parameterType="long"
+            resultType="com.side.pj.teamwork.attendance.dto.ResAttendanceDTO">
+        SELECT
+        attendance_start AS attendanceStart,
+        attendance_end   AS attendanceEnd
+        FROM attendance
+        WHERE user_id = #{userId}
+        AND attendance_start >= CURDATE()
+        AND attendance_start &lt;  CURDATE() + INTERVAL 1 DAY
+        LIMIT 1
+    </select>
+
+    <update id="">
+
+    </update>
+
+</mapper>

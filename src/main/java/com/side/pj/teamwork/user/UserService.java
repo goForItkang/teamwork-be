@@ -53,6 +53,15 @@ public class UserService {
             return ApiResponse.error(400,"회원가입 실패 조금이후 다시 실행해주세요!");
         }
     }
-
+    @Transactional
+    public Long getUserIdByLoginId(String loginId) {
+        Long id = null;
+        try {
+            id = userMapper.selectUserLoginId(loginId);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return id;
+    }
 
 }

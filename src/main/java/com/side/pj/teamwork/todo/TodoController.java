@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.http.HttpResponse;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3003")
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class TodoController {
@@ -35,5 +35,22 @@ public class TodoController {
                 ApiResponse.success(todoService.getTodos(company,status,id))
         );
     }
+    @GetMapping("/todo/{id}")
+    public ResponseEntity<ApiResponse> todoDetail(@PathVariable Long id){
+        System.out.println("id = " + id);
+        return ResponseEntity.ok(
+                ApiResponse.success(todoService.getTodoDetails(id))
+        );
+    }
+    //프로젝트 시작
+    @PutMapping("/todo/start")
+    public ResponseEntity<ApiResponse> startTodo(@RequestParam Long id){
+        return ResponseEntity.ok(ApiResponse.success(todoService.todoStart(id)));
+    }
+    @PutMapping("/todo/confirm")
+    public ResponseEntity<ApiResponse> confirmTodo(@RequestParam Long id){
+        return ResponseEntity.ok(ApiResponse.success(todoService.todoConfirm(id)));
+    }
+
 
 }

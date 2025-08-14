@@ -15,5 +15,8 @@
     <insert id="insertUser" useGeneratedKeys="true" keyProperty="id" parameterType="com.side.pj.teamwork.user.dto.ResLoginUser">
         insert into user (login_id,password,name,createAt) values (#{loginId},#{password},#{name},now())
     </insert>
+    <select id="selectUserLoginId" parameterType="string" resultType="long">
+        select id from user where login_id = #{loginId}
+    </select>
 
 </mapper>

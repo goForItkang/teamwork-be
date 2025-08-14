@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-@CrossOrigin("http://localhost:3003")
+@CrossOrigin("http://localhost:3000")
 public class UserController {
     private final UserService userService;
     // 팀장이 사업 및 팀장이 사원에 아이디 및 정보를 가입 시는거 

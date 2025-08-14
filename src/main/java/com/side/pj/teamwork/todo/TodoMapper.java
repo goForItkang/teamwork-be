@@ -15,4 +15,10 @@ public interface TodoMapper {
     List<ResDashTodo> selectByCompanyAndDepartment(Map<String, Object> params);
 
     List<ResTodo> selectByCompanyAndStatus(Map<String, String> params);
+
+    ResTodo selectByTodoId(Long id);
+
+    void todoStart(Long id);
+
+    void todoConfirm(Long id);
 }

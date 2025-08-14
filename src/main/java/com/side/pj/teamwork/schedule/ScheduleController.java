@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@CrossOrigin("http://localhost:3003")
+@CrossOrigin("http://localhost:3000")
 @RequiredArgsConstructor
 public class ScheduleController {
     private final ScheduleService scheduleService;

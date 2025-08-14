@@ -1,5 +1,6 @@
 package com.side.pj.teamwork.todo;
 
+import com.side.pj.teamwork.config.ApiResponse;
 import com.side.pj.teamwork.todo.dto.ResDashTodo;
 import com.side.pj.teamwork.todo.dto.ResTodo;
 import lombok.RequiredArgsConstructor;
@@ -30,5 +31,27 @@ public class TodoService {
         params.put("id",id);
 
         return todoMapper.selectByCompanyAndStatus(params);
+    }
+
+    public ResTodo getTodoDetails(Long id) {
+        return todoMapper.selectByTodoId(id);
+    }
+    //rollback 처리
+    public Object todoStart(Long id) {
+        try{
+            todoMapper.todoStart(id);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return ApiResponse.success(null);
+    }
+    // rollback 처리
+    public Object todoConfirm(Long id) {
+        try{
+            todoMapper.todoConfirm(id);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return ApiResponse.success(null);
     }
 }

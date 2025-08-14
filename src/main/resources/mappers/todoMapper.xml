@@ -53,5 +53,27 @@
         and u.login_id = #{id}
         and c.name = #{company}
     </select>
+    <select id="selectByTodoId" parameterType="long" resultType="com.side.pj.teamwork.todo.dto.ResTodo">
+        select
+            t.id as id,
+            t.title as title,
+            t.content as content,
+            l.name as level,
+            s.name as status,
+            t.create_time as createTime,
+            t.expired_Time as expiredTime
+        from todo t
+            join level l on t.level_id = l.id
+            join status s on s.id = t.todo_status_id
+        where t.id = #{id}
+    </select>
+    <update id="todoStart" parameterType="long" >
+        update todo
+        set todo_status_id = '2', update_time=now() where id = #{id}
+    </update>
+    <update id="todoConfirm" parameterType="long">
+        update todo
+        set todo_status_id = '3', update_time = now() where id = #{id};
+    </update>
 
 </mapper>
