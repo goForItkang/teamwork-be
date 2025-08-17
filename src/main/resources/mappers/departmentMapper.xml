@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.side.pj.teamwork.department.DepartmentMapper" >
+    <select id="selectByUserIdAndCompany" parameterType="string"
+            resultType="com.side.pj.teamwork.department.dto.ResDepartmentDash">
+        select
+        d.name as departmentName ,
+        u.name as username
+        from department d
+        join company c
+        on d.company_id = c.id
+        join user u
+        where c.name = #{company}
+        and u.login_id = #{id}
+    </select>
+</mapper>

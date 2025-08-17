@@ -2,6 +2,7 @@ package com.side.pj.teamwork.user;
 
 import com.side.pj.teamwork.user.dto.ReqSignupUser;
 import com.side.pj.teamwork.user.dto.ResLoginUser;
+import com.side.pj.teamwork.user.dto.ResUserInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -13,4 +14,6 @@ public interface UserMapper {
     void insertUser(ReqSignupUser reqSignupUser);
 
     Long selectUserLoginId(String loginId);
+
+    ResUserInfo selectUserByLoginId(String loginId);
 }

@@ -1,22 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-                "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.side.pj.teamwork.schedule.ScheduleMapper">
-    <select id="selectByCompanyAndMonth" parameterType="map" resultType="com.side.pj.teamwork.schedule.dto.ResSchedule">
+<mapper namespace="com.side.pj.teamwork.user.UserMapper">
+    <select id="selectUser" parameterType="String" resultType="com.side.pj.teamwork.user.dto.ResLoginUser">
         select
-            s.id,
-            s.title,
-            s.content,
-            s.start_date as startDate,
-            s.end_date as endDate,
-            s_s.name as scheduleStatus
-
-            from schedule s
-            join company c on s.company_id = c.id
-            join schedule_status s_s on s.schedule_status_id = s_s.id
-                 where s.start_date>#{month}
-        and c.name = #{company};
+            id,
+            login_id as loginId,
+            password,
+            name,
+            role_id
+        from user where login_id = #{id}
+    </select>
+    <insert id="insertUser" useGeneratedKeys="true" keyProperty="id" parameterType="com.side.pj.teamwork.user.dto.ResLoginUser">
+        insert into user (login_id,password,name,createAt) values (#{loginId},#{password},#{name},now())
+    </insert>
+    <select id="selectUserLoginId" parameterType="string" resultType="long">
+        select id from user where login_id = #{loginId}
+    </select>
+<!--    메인 화면에 유저 정보 가져오는 데이터-->
+    <select id="selectUserByLoginId" parameterType="string" resultType="com.side.pj.teamwork.user.dto.ResUserInfo">
+        select
+            u.name as username,
+            j.name as position,
+            d.name as department
+        from user u
+        join job_position j on u.job_position_id = j.id
+        join department d on u.department_id = d.id
+        where u.login_id = #{loginId}
     </select>
 
 </mapper>

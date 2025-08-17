@@ -27,6 +27,7 @@ public class AttendanceController {
     }
     @PostMapping("/outwork")
     public ResponseEntity<ApiResponse> outAttendance(){
+        System.out.println("이건받아와진거냐 ?");
         String id = SecurityContextHolder.getContext().getAuthentication().getName();
         return ResponseEntity.ok(ApiResponse.success(attendanceService.outWork(id)));
     }

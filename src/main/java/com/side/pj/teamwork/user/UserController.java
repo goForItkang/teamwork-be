@@ -5,6 +5,7 @@ import com.side.pj.teamwork.user.dto.ReqLoginUser;
 import com.side.pj.teamwork.user.dto.ReqSignupUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,6 +25,15 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse> userLogin(@RequestBody ReqLoginUser reqLoginUser){
         return ResponseEntity.ok(ApiResponse.success(userService.login(reqLoginUser)));
+    }
+    @GetMapping("/user/info")
+    public ResponseEntity<ApiResponse> userInfo(){
+        String loginId = SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                    userService.getUserInfo(loginId)
+                )
+        );
     }
 
 }

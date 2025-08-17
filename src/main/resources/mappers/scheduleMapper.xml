@@ -1,22 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.side.pj.teamwork.user.UserMapper">
-    <select id="selectUser" parameterType="String" resultType="com.side.pj.teamwork.user.dto.ResLoginUser">
-        select
-                id,
-                login_id as loginId,
-                password,
-                name,
-                role_id
-            from user where login_id = #{id}
+<mapper namespace="com.side.pj.teamwork.schedule.ScheduleMapper">
+    <select id="selectByCompanyAndMonth" parameterType="map" resultType="com.side.pj.teamwork.schedule.dto.ResSchedule">
+    select
+        s.id,
+        s.title,
+        s.content,
+        s.start_date as startDate,
+        s.end_date as endDate,
+        s_s.name as scheduleStatus
+
+        from schedule s
+             join company c on s.company_id = c.id
+             join schedule_status s_s on s.schedule_status_id = s_s.id
+        where s.start_date>#{month}
+      and c.name = #{company};
     </select>
-    <insert id="insertUser" useGeneratedKeys="true" keyProperty="id" parameterType="com.side.pj.teamwork.user.dto.ResLoginUser">
-        insert into user (login_id,password,name,createAt) values (#{loginId},#{password},#{name},now())
+    <select id="selectByCompanyAndMonthAndDay"
+            parameterType="map"
+            resultType="com.side.pj.teamwork.schedule.dto.ResSchedule">
+        SELECT
+        *
+        FROM schedule s
+        JOIN company c ON s.company_id = c.id
+        WHERE c.name = #{company}
+
+        <!-- day, month 둘 다 null이면 오늘 날짜와 이번달 -->
+        <if test="day == null and month == null">
+            AND (
+            DATE(s.start_date) = CURRENT_DATE
+            OR (MONTH(s.start_date) = MONTH(CURRENT_DATE)
+            AND YEAR(s.start_date) = YEAR(CURRENT_DATE))
+            )
+        </if>
+
+        <!-- day가 1 이상이면 해당 날짜 필터 -->
+        <if test="day != null and day &gt;= 1">
+            AND DAY(s.start_date) = #{day}
+        </if>
+
+        <!-- month가 존재하면 해당 달 필터 -->
+        <if test="month != null">
+            AND MONTH(s.start_date) = #{month}
+        </if>
+    </select>
+    <insert id="addSchedule" parameterType="com.side.pj.teamwork.schedule.dto.ReqScheduleDTO">
+        insert into schedule (id,title,content,start_date,end_date,schedule_status_id,company_id)
+        values (3,#{title},#{content},#{startDate},#{endDate},#{statusId},#{companyId})
     </insert>
-    <select id="selectUserLoginId" parameterType="string" resultType="long">
-        select id from user where login_id = #{loginId}
-    </select>
-
 </mapper>

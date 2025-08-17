@@ -1,5 +1,7 @@
 package com.side.pj.teamwork.schedule;
 
+import com.side.pj.teamwork.config.ApiResponse;
+import com.side.pj.teamwork.schedule.dto.ReqScheduleDTO;
 import com.side.pj.teamwork.schedule.dto.ResSchedule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,5 +22,22 @@ public class ScheduleService {
         params.put("company",company);
         params.put("month",startDate);
         return scheduleMapper.selectByCompanyAndMonth(params);
+    }
+
+    public List<ResSchedule> getMontAndDay(String company, String month, String day) {
+        Map<String,Object> params = new HashMap<>();
+        params.put("company",company);
+        params.put("month",month);
+        params.put("day",day);
+        return scheduleMapper.selectByCompanyAndMonthAndDay(params);
+    }
+    // 저장하는 mapper
+    public ApiResponse addSchedule(ReqScheduleDTO reqScheduleDTO) {
+        try {
+            scheduleMapper.addSchedule(reqScheduleDTO);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return ApiResponse.success(null);
     }
 }

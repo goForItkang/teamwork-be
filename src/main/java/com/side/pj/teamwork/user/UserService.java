@@ -5,6 +5,7 @@ import com.side.pj.teamwork.config.SecurityConfig;
 import com.side.pj.teamwork.user.dto.ReqLoginUser;
 import com.side.pj.teamwork.user.dto.ReqSignupUser;
 import com.side.pj.teamwork.user.dto.ResLoginUser;
+import com.side.pj.teamwork.user.dto.ResUserInfo;
 import com.side.pj.teamwork.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -64,4 +65,7 @@ public class UserService {
         return id;
     }
 
+    public ResUserInfo getUserInfo(String loginId) {
+        return userMapper.selectUserByLoginId(loginId);
+    }
 }

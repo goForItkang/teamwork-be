@@ -18,8 +18,11 @@
         LIMIT 1
     </select>
 
-    <update id="">
-
+    <update id="updateEnd" parameterType="map">
+        update attendance set attendance_end = now()
+        WHERE user_id = #{userId}
+          AND attendance_start >= CURDATE()
+          AND attendance_start &lt;  CURDATE() + INTERVAL 1 DAY
     </update>
 
 </mapper>
