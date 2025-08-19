@@ -29,7 +29,6 @@ public class TodoController {
             @RequestParam(required = true) String company,
             @RequestParam(required = true) String status
     ){
-        System.out.println("todo인덱스페이지 라고 할수있징~company = " + company + ", status = " + status);
         String id = SecurityContextHolder.getContext().getAuthentication().getName(); // 사용자 id ex)test
         return ResponseEntity.ok(
                 ApiResponse.success(todoService.getTodos(company,status,id))
